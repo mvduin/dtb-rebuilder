@@ -2354,7 +2354,7 @@
 			#size-cells = <0>;
 		};
 
-		vip1: vip@0x48970000 {
+		vip1: vip@48970000 {
 			compatible = "ti,vip1";
 			reg = <0x48970000 0x114>,
 			      <0x48975500 0xD8>,

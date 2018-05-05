@@ -96,7 +96,7 @@
 			status = "disabled";
 		};
 
-		vip2: vip@0x48990000 {
+		vip2: vip@48990000 {
 			compatible = "ti,vip2";
 			reg = <0x48990000 0x114>,
 			      <0x48995500 0xD8>,
@@ -148,7 +148,7 @@
 			};
 		};
 
-		vip3: vip@0x489b0000 {
+		vip3: vip@489b0000 {
 			compatible = "ti,vip3";
 			reg = <0x489b0000 0x114>,
 			      <0x489b5500 0xD8>,
