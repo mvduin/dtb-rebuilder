@@ -41,6 +41,10 @@
 		d_can0 = &dcan1;
 		d_can1 = &dcan2;
 		spi0 = &qspi;
+		spi1 = &mcspi1;
+		spi2 = &mcspi2;
+		spi3 = &mcspi3;
+		spi4 = &mcspi4;
 	};
 
 	timer {
