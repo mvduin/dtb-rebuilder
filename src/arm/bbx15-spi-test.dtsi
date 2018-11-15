@@ -1,0 +1,98 @@
+#include "dra7-uio-pruss.dtsi"
+
+// BeagleBoard-X15 spi test
+//
+// Note that letting the kernel setup pinmux (based on devicetree) may glitch the I/Os.
+//
+// If you're not going to do your pinmux setup in u-boot, at the very least disable the
+// default pinmux performed by u-boot (intended for the am572x uEVM).  See:
+//	https://github.com/dutchanddutch/u-boot/tree/patch/ti2017.01/x15-pinmux
+//
+// This test requires external loopback connections:
+//	 mcspi     pru
+//	P17.04 --> P17.03
+//	P17.07 --> P17.06
+//	P17.33 --> P17.34
+//	P17.36 <-- P17.37
+//
+// Then run spi-test.py in the pru-examples directory.
+
+&mcspi3 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcspi3_pins>;
+
+	spidev@1 {
+		reg = <1>;
+		compatible = "spidev";
+		spi-max-frequency = <24000000>;
+		spi-cpol; spi-cpha;
+	};
+};
+
+&dra7_pmx_core {
+	mcspi3_pins: mcspi3 {
+		pinctrl-single,pins = <
+			// mcspi3 ioset 6
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 228, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // P17.33  cs1
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 224, PIN_INPUT_PULLUP  | MUX_MODE1 )  // P17.04  clk
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 225, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // P17.07  d1 (mosi)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 226, PIN_INPUT_PULLUP  | MUX_MODE1 )  // P17.36  d0 (miso)
+		>;
+	};
+};
+
+#if 1
+
+&pruss2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pruss2_pins>;
+};
+
+&dra7_pmx_core {
+	pruss2_pins: pruss2 {
+		pinctrl-single,pins = <
+			// pruss2 core 0 ioset 2
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 222, PIN_INPUT_PULLUP | MUX_MODE12 )  // P17.03  in   1  (sclk)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 223, PIN_INPUT_PULLUP | MUX_MODE12 )  // P17.34  in   2  (cs)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 229, PIN_OUTPUT       | MUX_MODE13 )  // P17.37  out  8  (miso)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 232, PIN_INPUT_PULLUP | MUX_MODE12 )  // P17.06  in  11  (mosi)
+		>;
+	};
+};
+
+#else
+
+// XXX should I configure iodelay? especially considering erratum i933
+
+&pruss2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pruss2_pins>, <&pruss2_iodelay>;
+};
+
+&dra7_pmx_core {
+	pruss2_pins: pruss2 {
+		pinctrl-single,pins = <
+			// pruss2 core 0 ioset 2
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 222, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.03  in   1  (sclk)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 223, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.34  in   2  (cs)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 229, PIN_OUTPUT       | MUX_MODE13 | MODE_SELECT )  // P17.37  out  8  (miso)
+			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 232, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.06  in  11  (mosi)
+		>;
+	};
+};
+
+&dra7_iodelay_core {
+	pruss2_iodelay: pruss2 {
+		pinctrl-pin-array = <
+			// pruss2 core 0 ioset 2
+			(12 *  15 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.03  in   1  (sclk)
+			(12 * 134 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.34  in   2  (cs)
+			(12 * 140 + 8)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.37  out  8  (miso)
+			(12 * 143 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.06  in  11  (mosi)
+		>;
+	};
+};
+
+#endif

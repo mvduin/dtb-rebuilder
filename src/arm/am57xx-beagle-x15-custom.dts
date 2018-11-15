@@ -1,0 +1,181 @@
+#include "am57xx-beagle-x15-revc.dts"
+//#include "dra7-pin-convenience.h"
+//#include "am57xx-beagle-x15-pruss2-gpio.dtsi"
+//#include "bbx15-spi-test.dtsi"
+
+&{/leds/led0} {  label = "usr0";  linux,default-trigger = "cpu0";  };
+&{/leds/led1} {  label = "usr1";  linux,default-trigger = "cpu1";  };
+&{/leds/led2} {  label = "usr2";  linux,default-trigger = "mmc0";  };
+&{/leds/led3} {  label = "usr3";  linux,default-trigger = "mmc1";  };
+
+//&mac {  /delete-property/ dual_emac;  };
+
+&timer2 {
+	reg = <0x48032000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer2";
+};
+
+&timer5 {
+	reg = <0x48820000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer5";
+};
+
+&timer10 {
+	reg = <0x48086000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer10";
+};
+
+&timer11 {
+	reg = <0x48088000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer11";
+};
+
+&timer12 {
+	reg = <0x4ae20000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer12";
+};
+
+&timer13 {
+	reg = <0x48828000 0x1000>;
+	compatible = "uio";
+	symlink = "uio/timer13";
+};
+
+&gpu {  status = "disabled";  };
+
+&dsp1 {  status = "enabled";  };
+
+&epwmss0 {  status = "okay";  };
+&ehrpwm0 {  status = "okay";  };
+&ecap0 {  status = "okay";  };
+
+&epwmss1 {  status = "okay";  };
+&ehrpwm1 {  status = "okay";  };
+&ecap1 {  status = "okay";  };
+
+&epwmss2 {  status = "okay";  };
+&ehrpwm2 {  status = "okay";  };
+&ecap2 {  status = "okay";  };
+
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	// Any name is fine as long as it doesn't conflict with existing nodes
+	gpio-demo {
+		compatible = "gpio-of-helper";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_demo_pins>;
+
+		P16.36 {
+			gpio = <&gpio7 3 GPIO_ACTIVE_HIGH>;
+			input;
+			dir-changeable;
+		};
+
+		P16.43 {
+			gpio = <&gpio7 4 GPIO_ACTIVE_HIGH>;
+			input;
+			dir-changeable;
+		};
+	};
+};
+
+&dra7_pmx_core {
+	gpio_demo_pins: gpio-demo {
+		pinctrl-single,pins = <
+			(4 * 16) (PIN_INPUT_PULLUP | MUX_MODE14)  // P16.36 / gpio7.3
+			(4 * 17) (PIN_INPUT_PULLUP | MUX_MODE14)  // P16.43 / gpio7.4
+		>;
+	};
+};
+
+
+//&dra7_pmx_core {
+//	mcspi4_pins: mcspi4 {
+//		pinctrl-single,pins = <
+//			PINCONF( 229, PIN_INPUT_PULLUP  | MUX_MODE1 )  // clk
+//			PINCONF( 230, PIN_INPUT_PULLUP  | MUX_MODE1 )  // d1 (miso)
+//			PINCONF( 231, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // d0 (mosi)
+//			PINCONF( 232, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // cs0
+//		>;
+//	};
+//};
+//
+//&mcspi4 {
+//	status = "okay";
+//	pinctrl-names = "default";
+//	pinctrl-0 = <&mcspi4_pins>;
+//
+//	/* configure d0=mosi and d1=miso (default is opposite) */
+//	ti,pindir-d0-out-d1-in;
+//	
+//	spidev@0 {
+//		reg = <0>;
+//		compatible = "spidev";
+//		spi-max-frequency = <48000000>;
+//	};
+//};
+
+//&dra7_pmx_core {
+//	mcspi3_pins: mcspi3 {
+//		pinctrl-single,pins = <
+//			// mcspi3 ioset6
+//		//	PINCONF( 228, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // cs1
+//		//	PINCONF( 224, PIN_INPUT_PULLUP  | MUX_MODE1 )  // clk
+//		//	PINCONF( 225, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // d1 (mosi)
+//		//	PINCONF( 226, PIN_INPUT_PULLUP  | MUX_MODE1 )  // d0 (miso)
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 228, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // P17.33  cs1
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 224, PIN_INPUT_PULLUP  | MUX_MODE1 )  // P17.04  clk
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 225, PIN_OUTPUT_PULLUP | MUX_MODE1 )  // P17.07  d1 (mosi)
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 226, PIN_INPUT_PULLUP  | MUX_MODE1 )  // P17.36  d0 (miso)
+//		>;
+//	};
+//};
+//
+//&mcspi3 {
+//	status = "okay";
+//	pinctrl-names = "default";
+//	pinctrl-0 = <&mcspi3_pins>;
+//
+//	spidev@1 {
+//		reg = <1>;
+//		compatible = "spidev";
+//		spi-max-frequency = <24000000>;
+//		spi-cpol; spi-cpha;
+//	};
+//};
+//
+//&dra7_pmx_core {
+//	pruss2_pins: pruss2 {
+//		pinctrl-single,pins = <
+//			// pruss2 core 0 ioset 2
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 222, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.03  in   1  (sclk)
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 223, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.34  in   2  (cs)
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 229, PIN_OUTPUT       | MUX_MODE13 | MODE_SELECT )  // P17.37  out  8  (miso)
+//			DRA7XX_CORE_IOPAD( 0x3400 + 4 * 232, PIN_INPUT_PULLUP | MUX_MODE12 | MODE_SELECT )  // P17.06  in  11  (mosi)
+//		>;
+//	};
+//};
+//
+//&dra7_iodelay_core {
+//	pruss2_iodelay: pruss2 {
+//		pinctrl-pin-array = <
+//			// pruss2 core 0 ioset 2
+//			(12 *  15 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.03  in   1  (sclk)
+//			(12 * 134 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.34  in   2  (cs)
+//			(12 * 143 + 0)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.06  in  11  (mosi)
+//			(12 * 140 + 8)  A_DELAY_PS(0)  G_DELAY_PS(0)  // P17.37  out  8  (miso)
+//		>;
+//	};
+//};
+//
+//&pruss2 {
+//	pinctrl-names = "default";
+//	pinctrl-0 = <&pruss2_pins>;//, <&pruss2_iodelay>;
+//};
